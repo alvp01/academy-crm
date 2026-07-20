@@ -1,0 +1,47 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Unknown (empty project — no source files detected)
+  Architecture: Not yet determined
+  Testing: No test runner detected
+  Style: Not yet determined
+  Persistence: OpenSpec file-based
+
+strict_tdd: false
+
+testing:
+  runner: none
+  command: ""
+  coverage_command: ""
+  linter: ""
+  type_checker: ""
+  formatter: ""
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Capabilities section is mandatory (contract with sdd-spec)
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Every requirement must have at least one scenario
+  design:
+    - Document architecture decisions with rationale
+    - Include concrete file paths
+    - Keep under 800 words
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+    - Include Review Workload Forecast for changes above 200 lines
+  apply:
+    guidelines:
+      - Follow existing code patterns once codebase is established
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
+    - ISO date format for archive folder prefix (YYYY-MM-DD)

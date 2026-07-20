@@ -1,0 +1,23 @@
+# Created by venv
+*.pyc
+__pycache__/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+
+# Node
+node_modules/
+pnpm-lock.yaml
+
+# Docker
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
