@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta, timezone
 
 from jose import JWTError, jwt
@@ -37,3 +38,13 @@ def decode_token(token: str) -> dict | None:
         return jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
     except JWTError:
         return None
+
+
+def hash_token(token: str) -> str:
+    """Hash a refresh token using SHA-256 hex digest."""
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def verify_token(token: str, token_hash: str) -> bool:
+    """Verify a refresh token against its SHA-256 hash."""
+    return hash_token(token) == token_hash
