@@ -32,25 +32,25 @@
 
 ## Phase 3: Service Rewrite
 
-- [ ] 3.1 Inject `RefreshTokenRepository` into `AuthService.__init__()` in `backend/app/services/auth.py`, keep `_revoked_refresh_tokens` as fallback
-- [ ] 3.2 Update `AuthService.login()` — after creating tokens, call `RefreshTokenRepository.create()` to persist the refresh token
-- [ ] 3.3 Rewrite `AuthService.refresh()` — replace in-memory set check with `repo.get_by_jti()`, add reuse detection (revoked row → `repo.revoke_all_for_academy()` + 401), rotate via revoke old + create new
-- [ ] 3.4 Add `AuthService.logout(refresh_token)` — decode, extract jti/academy_id, call `repo.revoke()`
+- [x] 3.1 Inject `RefreshTokenRepository` into `AuthService.__init__()` in `backend/app/services/auth.py`, keep `_revoked_refresh_tokens` as fallback
+- [x] 3.2 Update `AuthService.login()` — after creating tokens, call `RefreshTokenRepository.create()` to persist the refresh token
+- [x] 3.3 Rewrite `AuthService.refresh()` — replace in-memory set check with `repo.get_by_jti()`, add reuse detection (revoked row → `repo.revoke_all_for_academy()` + 401), rotate via revoke old + create new
+- [x] 3.4 Add `AuthService.logout(refresh_token)` — decode, extract jti/academy_id, call `repo.revoke()`
 
 ## Phase 4: API Layer
 
-- [ ] 4.1 Add `POST /api/auth/logout` endpoint in `backend/app/api/auth.py` — accepts `RefreshRequest` body, calls `AuthService.logout()`
-- [ ] 4.2 Verify `POST /api/auth/refresh` still works with DB rotation (schema already exists in `backend/app/schemas/auth.py`)
+- [x] 4.1 Add `POST /api/auth/logout` endpoint in `backend/app/api/auth.py` — accepts `RefreshRequest` body, calls `AuthService.logout()`
+- [x] 4.2 Verify `POST /api/auth/refresh` still works with DB rotation (schema already exists in `backend/app/schemas/auth.py`)
 
 ## Phase 5: Testing
 
 - [x] 5.1 Unit tests for `hash_token` / `verify_token` — deterministic SHA-256, wrong token returns False
 - [x] 5.2 Unit tests for `RefreshTokenRepository` — mock AsyncSession, verify create/get_by_jti/revoke/revoke_all_for_academy/cleanup_expired SQL calls
-- [ ] 5.3 Unit tests for `AuthService` rotation — mock repo, verify revoke → create sequence on refresh
-- [ ] 5.4 RED: Token reuse detection test — login, refresh (old token revoked), attempt refresh with old token → 401 + all academy tokens revoked
-- [ ] 5.5 RED: Cross-academy isolation test — token from academy A rejected when academy_id mismatch
+- [x] 5.3 Unit tests for `AuthService` rotation — mock repo, verify revoke → create sequence on refresh
+- [x] 5.4 RED: Token reuse detection test — login, refresh (old token revoked), attempt refresh with old token → 401 + all academy tokens revoked
+- [x] 5.5 RED: Cross-academy isolation test — token from academy A rejected when academy_id mismatch
 - [ ] 5.6 Integration test: full login → refresh → logout flow via TestClient + real DB
-- [ ] 5.7 Verify existing `test_auth.py` tests still pass (no regressions)
+- [x] 5.7 Verify existing `test_auth.py` tests still pass (no regressions)
 
 ## Phase 6: Documentation
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db
-from app.schemas.auth import AcademyResponse, LoginRequest, RegisterRequest, TokenResponse
+from app.schemas.auth import AcademyResponse, LoginRequest, RefreshRequest, RegisterRequest, TokenResponse
 from app.services.auth import AuthService
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -22,6 +22,12 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(refresh_token: str, db: AsyncSession = Depends(get_db)):
+async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
     service = AuthService(db)
-    return await service.refresh(refresh_token)
+    return await service.refresh(data.refresh_token)
+
+
+@router.post("/logout", status_code=204)
+async def logout(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
+    service = AuthService(db)
+    await service.logout(data.refresh_token)
