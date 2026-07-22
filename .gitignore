@@ -21,3 +21,13 @@ pnpm-lock.yaml
 .idea/
 *.swp
 *.swo
+
+# OpenSpec: ignore by default, but keep change task files stageable
+openspec/**
+!openspec/
+!openspec/changes/
+!openspec/changes/**/
+!openspec/changes/**/tasks.md
+
+.atl
+opencode.json

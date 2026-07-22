@@ -123,24 +123,23 @@ class TestRefreshTokenRepositoryRevokeAll:
 
 class TestRefreshTokenRepositoryCleanupExpired:
     async def test_cleanup_expired_deletes_tokens(self, repo, mock_db):
-        expired_token = RefreshToken(id=uuid.uuid4(), jti="expired-1")
         mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = [expired_token]
+        mock_result.rowcount = 3
         mock_db.execute.return_value = mock_result
 
         count = await repo.cleanup_expired()
 
-        assert count == 1
-        mock_db.delete.assert_awaited_once_with(expired_token)
+        assert count == 3
+        mock_db.execute.assert_awaited_once()
         mock_db.commit.assert_awaited_once()
 
     async def test_cleanup_expired_no_tokens(self, repo, mock_db):
         mock_result = MagicMock()
-        mock_result.scalars.return_value.all.return_value = []
+        mock_result.rowcount = 0
         mock_db.execute.return_value = mock_result
 
         count = await repo.cleanup_expired()
 
         assert count == 0
-        mock_db.delete.assert_not_awaited()
+        mock_db.execute.assert_awaited_once()
         mock_db.commit.assert_awaited_once()

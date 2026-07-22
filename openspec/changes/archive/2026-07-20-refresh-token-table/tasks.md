@@ -49,9 +49,9 @@
 - [x] 5.3 Unit tests for `AuthService` rotation — mock repo, verify revoke → create sequence on refresh
 - [x] 5.4 RED: Token reuse detection test — login, refresh (old token revoked), attempt refresh with old token → 401 + all academy tokens revoked
 - [x] 5.5 RED: Cross-academy isolation test — token from academy A rejected when academy_id mismatch
-- [ ] 5.6 Integration test: full login → refresh → logout flow via TestClient + real DB
+- [x] 5.6 Integration test: full login → refresh → logout flow via TestClient + real DB
 - [x] 5.7 Verify existing `test_auth.py` tests still pass (no regressions)
 
 ## Phase 6: Documentation
 
-- [ ] 6.1 Update backend README with `POST /api/auth/logout` endpoint docs
+- [x] 6.1 Update backend README with `POST /api/auth/logout` endpoint docs
