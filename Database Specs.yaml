@@ -21,16 +21,6 @@ Classroom (belongs to a Headquarters, many to one relationship)
   - name: string | not null
   - classes_capacity: integer | not null
 
-Instructor (belongs to Academy, many to one relationship)
-  - id unique | not null | autoincrement
-  - academy_id: foreign key to Academy(id) | not null
-  - name: string | not null
-  - email: string | unique | not null
-  - identification_number: string | unique | not null
-  - phone_number: string | not null
-  - address: string | not null
-  - date_of_birth: date | not null
-
 Class (belongs to a Classroom, many to one relationship | many students thourgh ClassInscription (many to many) | many to one relationship with Instructor | many to one relationship with Schedule)
   - id unique | not null | autoincrement
   - classroom_id: foreign key to Classroom(id) | not null
@@ -39,6 +29,7 @@ Class (belongs to a Classroom, many to one relationship | many students thourgh 
   - start_date: date | not null
   - schedule_id: foreign key to Schedule(id) | not null
   - quota: integer | not null
+  - instructor_name: string | not null
 
 Student (belongs to Academy, many to one relationship)
   - id unique | not null | autoincrement
