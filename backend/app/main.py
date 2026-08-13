@@ -29,7 +29,28 @@ async def lifespan(app: FastAPI):
     await close_db()
 
 
-app = FastAPI(title="Academy CRM", version="0.1.0", lifespan=lifespan)
+app = FastAPI(
+    title="Academy CRM API",
+    description="Backend API for managing academies, headquarters, and classrooms.",
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=[
+        {
+            "name": "Authentication",
+            "description": "Register, login, refresh tokens, and logout. Start here to get an access token.",
+        },
+        {
+            "name": "Headquarters",
+            "description": "CRUD operations for academy headquarters (branches/campuses). Requires authentication.",
+        },
+        {
+            "name": "Classrooms",
+            "description": "CRUD operations for classrooms within headquarters. Requires authentication.",
+        },
+    ],
+)
 
 app.add_middleware(
     CORSMiddleware,
