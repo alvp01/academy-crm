@@ -19,7 +19,7 @@ export function Login() {
       // Fetch user info (decode from token or call an endpoint)
       // For now, store minimal info
       login(
-        { id: "", name: "", email, identification_number: "" },
+        { id: "", name: "", email },
         access_token,
         refresh_token
       );

@@ -58,7 +58,6 @@ async def academy_a(client: AsyncClient) -> dict:
     creds = {
         "name": "Academy A",
         "email": f"academy_a_{uuid.uuid4().hex[:8]}@test.com",
-        "identification_number": f"ID-A-{uuid.uuid4().hex[:8]}",
         "password": "testpass123",
     }
     resp = await client.post("/api/auth/register", json=creds)
@@ -72,7 +71,6 @@ async def academy_b(client: AsyncClient) -> dict:
     creds = {
         "name": "Academy B",
         "email": f"academy_b_{uuid.uuid4().hex[:8]}@test.com",
-        "identification_number": f"ID-B-{uuid.uuid4().hex[:8]}",
         "password": "testpass456",
     }
     resp = await client.post("/api/auth/register", json=creds)
