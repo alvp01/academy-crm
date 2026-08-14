@@ -25,7 +25,6 @@ class AuthService:
         academy = await self.repo.create(
             name=data.name,
             email=data.email,
-            identification_number=data.identification_number,
             password_hash=hash_password(data.password),
         )
         return academy
