@@ -22,7 +22,6 @@ async def test_full_auth_flow_register_login_refresh_logout(client: AsyncClient)
     creds = {
         "name": "Integration Academy",
         "email": f"integ_{uuid.uuid4().hex[:8]}@test.com",
-        "identification_number": f"ID-INT-{uuid.uuid4().hex[:8]}",
         "password": "integ_pass_123",
     }
     reg_resp = await client.post("/api/auth/register", json=creds)
@@ -86,7 +85,6 @@ async def test_logout_is_idempotent(client: AsyncClient):
     creds = {
         "name": "Idempotent Academy",
         "email": f"idemp_{uuid.uuid4().hex[:8]}@test.com",
-        "identification_number": f"ID-IDEMP-{uuid.uuid4().hex[:8]}",
         "password": "idemp_pass_123",
     }
     await client.post("/api/auth/register", json=creds)

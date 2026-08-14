@@ -6,7 +6,6 @@ from pydantic import BaseModel, EmailStr
 class RegisterRequest(BaseModel):
     name: str
     email: str
-    identification_number: str
     password: str
 
 
@@ -29,6 +28,5 @@ class AcademyResponse(BaseModel):
     id: uuid.UUID
     name: str
     email: str
-    identification_number: str
 
     model_config = {"from_attributes": True}

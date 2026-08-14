@@ -9,7 +9,6 @@ async def test_register_success(client: AsyncClient):
     resp = await client.post("/api/auth/register", json={
         "name": "Test Academy",
         "email": "test@example.com",
-        "identification_number": "ID-001",
         "password": "secret123",
     })
     assert resp.status_code == 201
@@ -24,7 +23,6 @@ async def test_register_duplicate_email(client: AsyncClient):
     payload = {
         "name": "Dup Academy",
         "email": "dup@example.com",
-        "identification_number": "ID-DUP",
         "password": "secret123",
     }
     resp1 = await client.post("/api/auth/register", json=payload)

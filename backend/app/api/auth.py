@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
     summary="Register a new academy",
     responses={
         201: {"description": "Academy created successfully"},
-        409: {"description": "Email or identification number already registered"},
+        409: {"description": "Email already registered"},
         422: {"description": "Validation error in request body"},
     },
 )
@@ -25,13 +25,12 @@ async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
 
     - **name**: Academy name
     - **email**: Unique email address
-    - **identification_number**: Unique tax/id number
     - **password**: Plain text password (hashed server-side)
 
     ```bash
     curl -X POST http://localhost:8001/api/auth/register \\
       -H "Content-Type: application/json" \\
-      -d '{"name": "Mi Academia", "email": "admin@academia.com", "identification_number": "123456789", "password": "secret123"}'
+      -d '{"name": "Mi Academia", "email": "admin@academia.com", "password": "secret123"}'
     ```
     """
     service = AuthService(db)

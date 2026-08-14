@@ -8,7 +8,6 @@ export function Register() {
   const login = useAuthStore((s) => s.login);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [identificationNumber, setIdentificationNumber] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -20,7 +19,6 @@ export function Register() {
       const regResp = await apiClient.post("/api/auth/register", {
         name,
         email,
-        identification_number: identificationNumber,
         password,
       });
 
@@ -33,7 +31,6 @@ export function Register() {
           id: regResp.data.id,
           name: regResp.data.name,
           email: regResp.data.email,
-          identification_number: regResp.data.identification_number,
         },
         access_token,
         refresh_token
@@ -66,16 +63,6 @@ export function Register() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Identification Number</label>
-          <input
-            type="text"
-            value={identificationNumber}
-            onChange={(e) => setIdentificationNumber(e.target.value)}
             className="w-full border rounded px-3 py-2"
             required
           />
