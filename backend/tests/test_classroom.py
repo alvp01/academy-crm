@@ -137,8 +137,8 @@ async def test_capacity_validation_error(client: AsyncClient, academy_a: dict):
 
 @pytest.mark.asyncio
 async def test_cross_academy_get_classroom_404(client: AsyncClient, academy_a: dict, academy_b: dict):
+    # Login as A first to create resources
     tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
-    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     hq_id = await _create_hq(client, tokens_a["access_token"], "Secret HQ")
     create_resp = await client.post(
@@ -147,6 +147,9 @@ async def test_cross_academy_get_classroom_404(client: AsyncClient, academy_a: d
         headers=auth_headers(tokens_a["access_token"]),
     )
     room_id = create_resp.json()["id"]
+
+    # Login as B — B's cookies replace A's
+    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     resp = await client.get(
         f"/api/classrooms/{room_id}",
@@ -157,8 +160,8 @@ async def test_cross_academy_get_classroom_404(client: AsyncClient, academy_a: d
 
 @pytest.mark.asyncio
 async def test_cross_academy_update_classroom_404(client: AsyncClient, academy_a: dict, academy_b: dict):
+    # Login as A first to create resources
     tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
-    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     hq_id = await _create_hq(client, tokens_a["access_token"], "Protected HQ")
     create_resp = await client.post(
@@ -167,6 +170,9 @@ async def test_cross_academy_update_classroom_404(client: AsyncClient, academy_a
         headers=auth_headers(tokens_a["access_token"]),
     )
     room_id = create_resp.json()["id"]
+
+    # Login as B — B's cookies replace A's
+    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     resp = await client.put(
         f"/api/classrooms/{room_id}",
@@ -178,8 +184,8 @@ async def test_cross_academy_update_classroom_404(client: AsyncClient, academy_a
 
 @pytest.mark.asyncio
 async def test_cross_academy_delete_classroom_404(client: AsyncClient, academy_a: dict, academy_b: dict):
+    # Login as A first to create resources
     tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
-    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     hq_id = await _create_hq(client, tokens_a["access_token"], "Safe HQ")
     create_resp = await client.post(
@@ -189,13 +195,17 @@ async def test_cross_academy_delete_classroom_404(client: AsyncClient, academy_a
     )
     room_id = create_resp.json()["id"]
 
+    # Login as B — B's cookies replace A's
+    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
+
     resp = await client.delete(
         f"/api/classrooms/{room_id}",
         headers=auth_headers(tokens_b["access_token"]),
     )
     assert resp.status_code == 404
 
-    # Academy A confirms still exists
+    # Academy A confirms still exists — login as A again
+    tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
     resp = await client.get(
         f"/api/classrooms/{room_id}",
         headers=auth_headers(tokens_a["access_token"]),

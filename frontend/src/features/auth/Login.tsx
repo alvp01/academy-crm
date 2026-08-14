@@ -15,14 +15,8 @@ export function Login() {
     setError("");
     try {
       const resp = await apiClient.post("/api/auth/login", { email, password });
-      const { access_token, refresh_token } = resp.data;
-      // Fetch user info (decode from token or call an endpoint)
-      // For now, store minimal info
-      login(
-        { id: "", name: "", email },
-        access_token,
-        refresh_token
-      );
+      const { id, name, email: userEmail } = resp.data;
+      login({ id, name, email: userEmail });
       navigate("/protected");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Login failed";

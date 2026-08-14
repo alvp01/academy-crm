@@ -11,6 +11,7 @@ from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    generate_csrf_token,
     hash_password,
     hash_token,
     verify_password,
@@ -19,7 +20,7 @@ from app.core.security import (
 from app.models.academy import Academy
 from app.repositories.academy import AcademyRepository
 from app.repositories.refresh_token import RefreshTokenRepository
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
+from app.schemas.auth import LoginRequest, RegisterRequest
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,8 @@ class AuthService:
         self.repo = AcademyRepository(db)
         self.refresh_repo = RefreshTokenRepository(db)
 
-    async def register(self, data: RegisterRequest) -> Academy:
+    async def register(self, data: RegisterRequest) -> tuple[Academy, str, str, str]:
+        """Register a new academy. Returns (academy, access_token, refresh_token, csrf_token)."""
         existing = await self.repo.get_by_email(data.email)
         if existing:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
@@ -43,9 +45,31 @@ class AuthService:
             email=data.email,
             password_hash=hash_password(data.password),
         )
-        return academy
 
-    async def login(self, data: LoginRequest) -> TokenResponse:
+        # Generate tokens for the new academy
+        jti = str(uuid.uuid4())
+        token_data = {"sub": str(academy.id), "jti": jti}
+        access_token = create_access_token(token_data)
+        refresh_token = create_refresh_token(token_data)
+        csrf_token = generate_csrf_token()
+
+        # Persist refresh token in database
+        try:
+            expires_at = (datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_EXPIRY_DAYS)).replace(tzinfo=None)
+            await self.refresh_repo.create(
+                academy_id=academy.id,
+                token_hash=hash_token(refresh_token),
+                jti=jti,
+                expires_at=expires_at,
+            )
+        except SQLAlchemyError as e:
+            logger.warning("DB unavailable during register, using in-memory fallback: %s", e)
+            pass
+
+        return academy, access_token, refresh_token, csrf_token
+
+    async def login(self, data: LoginRequest) -> tuple[Academy, str, str, str]:
+        """Authenticate and return (academy, access_token, refresh_token, csrf_token)."""
         academy = await self.repo.get_by_email(data.email)
         if not academy or not verify_password(data.password, academy.password_hash):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
@@ -54,6 +78,7 @@ class AuthService:
         token_data = {"sub": str(academy.id), "jti": jti}
         access_token = create_access_token(token_data)
         refresh_token = create_refresh_token(token_data)
+        csrf_token = generate_csrf_token()
 
         # Persist refresh token in database
         try:
@@ -66,15 +91,12 @@ class AuthService:
             )
         except SQLAlchemyError as e:
             logger.warning("DB unavailable during login, using in-memory fallback: %s", e)
-            # Fallback: just add to in-memory set (less secure but allows login)
             pass
 
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-        )
+        return academy, access_token, refresh_token, csrf_token
 
-    async def refresh(self, refresh_token: str) -> TokenResponse:
+    async def refresh(self, refresh_token: str) -> tuple[str, str, str]:
+        """Rotate refresh token. Returns (new_access_token, new_refresh_token, csrf_token)."""
         payload = decode_token(refresh_token)
         if payload is None or payload.get("type") != "refresh":
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
@@ -148,6 +170,7 @@ class AuthService:
         token_data = {"sub": str(academy.id), "jti": new_jti}
         new_access_token = create_access_token(token_data)
         new_refresh_token = create_refresh_token(token_data)
+        csrf_token = generate_csrf_token()
 
         # Persist new refresh token
         try:
@@ -160,14 +183,9 @@ class AuthService:
             )
         except SQLAlchemyError as e:
             logger.error("Failed to persist new refresh token: %s", e)
-            # Token issued but not persisted — fallback to in-memory
-            # This is a degraded state but allows the user to continue
             pass
 
-        return TokenResponse(
-            access_token=new_access_token,
-            refresh_token=new_refresh_token,
-        )
+        return new_access_token, new_refresh_token, csrf_token
 
     async def logout(self, refresh_token: str) -> None:
         """Revoke a refresh token on logout."""

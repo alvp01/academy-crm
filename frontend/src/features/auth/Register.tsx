@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiClient } from "../../api/client";
-import { useAuthStore } from "../../store/auth";
 
 export function Register() {
   const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,27 +13,8 @@ export function Register() {
     e.preventDefault();
     setError("");
     try {
-      // Register
-      const regResp = await apiClient.post("/api/auth/register", {
-        name,
-        email,
-        password,
-      });
-
-      // Auto-login after registration
-      const loginResp = await apiClient.post("/api/auth/login", { email, password });
-      const { access_token, refresh_token } = loginResp.data;
-
-      login(
-        {
-          id: regResp.data.id,
-          name: regResp.data.name,
-          email: regResp.data.email,
-        },
-        access_token,
-        refresh_token
-      );
-      navigate("/protected");
+      await apiClient.post("/api/auth/register", { name, email, password });
+      navigate("/login");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Registration failed";
       setError(msg);

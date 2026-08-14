@@ -7,8 +7,8 @@ from tests.conftest import auth_headers, login_academy
 @pytest.mark.asyncio
 async def test_cross_academy_headquarter_denied(client: AsyncClient, academy_a: dict, academy_b: dict):
     """Academy A creates HQ, Academy B cannot see it."""
+    # Login as A first to create resource
     tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
-    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     # Academy A creates a headquarters
     resp = await client.post(
@@ -19,6 +19,9 @@ async def test_cross_academy_headquarter_denied(client: AsyncClient, academy_a: 
     assert resp.status_code == 201
     hq_id = resp.json()["id"]
 
+    # Login as B — B's cookies replace A's
+    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
+
     # Academy B tries to read Academy A's headquarters → 404
     resp = await client.get(
         f"/api/headquarters/{hq_id}",
@@ -26,7 +29,8 @@ async def test_cross_academy_headquarter_denied(client: AsyncClient, academy_a: 
     )
     assert resp.status_code == 404
 
-    # Academy A confirms resource still exists
+    # Academy A confirms resource still exists — login as A again
+    tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
     resp = await client.get(
         f"/api/headquarters/{hq_id}",
         headers=auth_headers(tokens_a["access_token"]),
@@ -38,8 +42,8 @@ async def test_cross_academy_headquarter_denied(client: AsyncClient, academy_a: 
 @pytest.mark.asyncio
 async def test_cross_academy_classroom_denied(client: AsyncClient, academy_a: dict, academy_b: dict):
     """Academy A creates Classroom, Academy B cannot see it."""
+    # Login as A first to create resources
     tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
-    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
 
     # Academy A creates a headquarters
     resp = await client.post(
@@ -59,6 +63,9 @@ async def test_cross_academy_classroom_denied(client: AsyncClient, academy_a: di
     assert resp.status_code == 201
     room_id = resp.json()["id"]
 
+    # Login as B — B's cookies replace A's
+    tokens_b = await login_academy(client, academy_b["email"], academy_b["password"])
+
     # Academy B tries to read → 404
     resp = await client.get(
         f"/api/classrooms/{room_id}",
@@ -66,7 +73,8 @@ async def test_cross_academy_classroom_denied(client: AsyncClient, academy_a: di
     )
     assert resp.status_code == 404
 
-    # Academy A confirms still exists
+    # Academy A confirms still exists — login as A again
+    tokens_a = await login_academy(client, academy_a["email"], academy_a["password"])
     resp = await client.get(
         f"/api/classrooms/{room_id}",
         headers=auth_headers(tokens_a["access_token"]),

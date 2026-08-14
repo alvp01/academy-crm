@@ -79,12 +79,33 @@ async def academy_b(client: AsyncClient) -> dict:
     return {**creds, **resp.json()}
 
 
+def get_auth_cookie(response, cookie_name: str) -> str | None:
+    """Extract a cookie value from Set-Cookie headers in a response."""
+    for header in response.headers.get_list("set-cookie"):
+        if header.startswith(f"{cookie_name}="):
+            return header.split(";")[0].split("=", 1)[1]
+    return None
+
+
 async def login_academy(client: AsyncClient, email: str, password: str) -> dict:
-    """Login and return token response."""
+    """Login and return tokens extracted from Set-Cookie headers."""
+    # Clear stale cookies from previous logins to prevent cross-academy contamination
+    client.cookies.clear()
     resp = await client.post("/api/auth/login", json={"email": email, "password": password})
     assert resp.status_code == 200
-    return resp.json()
+    access_token = get_auth_cookie(resp, "access_token")
+    refresh_token = get_auth_cookie(resp, "refresh_token")
+    csrf_token = get_auth_cookie(resp, "csrf_token")
+    assert access_token is not None, "access_token cookie not found in login response"
+    assert refresh_token is not None, "refresh_token cookie not found in login response"
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "csrf_token": csrf_token,
+        **resp.json(),
+    }
 
 
 def auth_headers(access_token: str) -> dict:
+    """Create Authorization Bearer header for tests using Bearer fallback."""
     return {"Authorization": f"Bearer {access_token}"}

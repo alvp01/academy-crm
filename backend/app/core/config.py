@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     JWT_EXPIRY_MINUTES: int = 30
     REFRESH_EXPIRY_DAYS: int = 7
     FRONTEND_URL: str = Field(default="http://localhost:5173", description="Frontend URL for CORS")
+    ENVIRONMENT: str = Field(default="development", description="Environment: development or production")
     DB_POOL_SIZE: int = Field(default=10, description="Database connection pool size")
     DB_MAX_OVERFLOW: int = Field(default=20, description="Database connection pool max overflow")
     DB_POOL_TIMEOUT: int = Field(default=30, description="Database connection pool timeout (seconds)")
