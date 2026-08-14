@@ -1,20 +1,21 @@
 schema: spec-driven
 
 context: |
-  Tech stack: Unknown (empty project — no source files detected)
-  Architecture: Not yet determined
-  Testing: No test runner detected
-  Style: Not yet determined
+  Tech stack: Python 3.11, FastAPI, SQLAlchemy 2.0 (async), PostgreSQL 16, Alembic (backend);
+              React 19, TypeScript 5.7, Vite 6, Tailwind CSS 3.4, Zustand 5, TanStack Query 5 (frontend)
+  Architecture: Layered (API → Services → Repositories), multi-tenant via academy_id
+  Testing: pytest + pytest-asyncio + httpx (backend); no frontend test runner
+  Style: Strict TypeScript (noUncheckedIndexedAccess), Python 3.11+, Docker Compose local dev
   Persistence: OpenSpec file-based
 
-strict_tdd: false
+strict_tdd: true
 
 testing:
-  runner: none
-  command: ""
+  runner: pytest
+  command: "cd backend && pytest -v"
   coverage_command: ""
   linter: ""
-  type_checker: ""
+  type_checker: "cd frontend && tsc --noEmit"
   formatter: ""
 
 rules:
@@ -35,12 +36,14 @@ rules:
     - Include Review Workload Forecast for changes above 200 lines
   apply:
     guidelines:
-      - Follow existing code patterns once codebase is established
-    tdd: false
-    test_command: ""
+      - Follow existing layered architecture (API → Services → Repositories)
+      - Maintain tenant isolation via academy_id on all new entities
+      - Use async/await patterns consistent with existing code
+    tdd: true
+    test_command: "cd backend && pytest -v"
   verify:
-    test_command: ""
-    build_command: ""
+    test_command: "cd backend && pytest -v"
+    build_command: "cd frontend && tsc && cd ../backend && python -m py_compile app/main.py"
     coverage_threshold: 0
   archive:
     - Warn before merging destructive deltas

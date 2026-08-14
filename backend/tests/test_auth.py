@@ -51,12 +51,12 @@ async def test_login_wrong_password(client: AsyncClient, academy_a: dict):
 @pytest.mark.asyncio
 async def test_refresh_token_success(client: AsyncClient, academy_a: dict):
     tokens = await login_academy(client, academy_a["email"], academy_a["password"])
-    resp = await client.post("/api/auth/refresh", params={"refresh_token": tokens["refresh_token"]})
+    resp = await client.post("/api/auth/refresh", json={"refresh_token": tokens["refresh_token"]})
     assert resp.status_code == 200
     assert "access_token" in resp.json()
 
 
 @pytest.mark.asyncio
 async def test_refresh_token_invalid(client: AsyncClient):
-    resp = await client.post("/api/auth/refresh", params={"refresh_token": "invalid.token.here"})
+    resp = await client.post("/api/auth/refresh", json={"refresh_token": "invalid.token.here"})
     assert resp.status_code == 401

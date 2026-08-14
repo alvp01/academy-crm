@@ -54,6 +54,13 @@ pnpm dev
 | POST | `/api/auth/register` | Register a new academy |
 | POST | `/api/auth/login` | Login and get tokens |
 | POST | `/api/auth/refresh` | Refresh access token |
+| POST | `/api/auth/logout` | Revoke refresh token (204) |
+
+> **POST /api/auth/logout** — Revokes a refresh token so it can no longer be used to obtain new access tokens. Subsequent refresh attempts with the same token will return `401`. The endpoint is idempotent: calling it with an already-revoked or invalid token still returns `204`.
+>
+> - **Body**: `{ "refresh_token": "..." }` — the refresh token from a previous login or refresh call
+> - **Response**: `204 No Content`
+> - **Effect**: Marks the token as revoked in the database; refresh rotation and reuse detection continue to work normally
 
 ### Headquarters (scoped by academy)
 | Method | Endpoint | Description |

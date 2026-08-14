@@ -7,16 +7,17 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.core.database import Base
+from app.core.database import Base, async_session_factory, engine
 from app.core.deps import get_db
 from app.core.security import hash_password
 from app.main import app
 
-# Use a separate test database
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@academy-crm-db:5432/academy_crm_test"
 
-engine = create_async_engine(TEST_DATABASE_URL, echo=False, pool_pre_ping=True)
-async_test_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+# Use the same database as the app
+TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@db:5432/academy_crm"
+
+test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, pool_pre_ping=True)
+async_test_session = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
 
 
 @pytest.fixture(scope="session")
@@ -28,13 +29,13 @@ def event_loop():
 
 @pytest_asyncio.fixture(autouse=True)
 async def setup_db():
-    async with engine.begin() as conn:
+    async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     yield
-    async with engine.begin() as conn:
+    async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    await engine.dispose()
+    await test_engine.dispose()
 
 
 async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
