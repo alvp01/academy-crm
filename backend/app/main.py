@@ -6,6 +6,7 @@ from sqlalchemy import text
 from app.api.auth import router as auth_router
 from app.api.classroom import router as classroom_router
 from app.api.headquarters import router as headquarters_router
+from app.api.student import router as student_router
 from app.core.config import settings
 from app.core.database import async_session_factory, close_db, init_db
 from app.repositories.refresh_token import RefreshTokenRepository
@@ -49,6 +50,10 @@ app = FastAPI(
             "name": "Classrooms",
             "description": "CRUD operations for classrooms within headquarters. Requires authentication.",
         },
+        {
+            "name": "Students",
+            "description": "CRUD operations for students. Supports search, filtering, and soft-delete.",
+        },
     ],
 )
 
@@ -63,6 +68,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(headquarters_router)
 app.include_router(classroom_router)
+app.include_router(student_router)
 
 
 @app.get("/health")

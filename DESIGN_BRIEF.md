@@ -67,15 +67,11 @@
 
 ## 🚀 Next Features (from Database Specs — Not Yet Implemented)
 
-### Phase 1: Instructor Management
-- Instructor CRUD (belongs to academy)
-- Fields: `name`, `email` (unique), `identification_number` (unique), `phone`, `address`, `date_of_birth`
-
-### Phase 2: Student Management
+### Phase 1: Student Management
 - Student CRUD (belongs to academy)
 - Fields: `name`, `email` (unique), `identification_number` (unique), `phone`, `address`, `date_of_birth`, `allergies`, `referral_source`, `occupation`
 
-### Phase 3: Schedule & Classes
+### Phase 2: Schedule & Classes
 - **Schedule CRUD** (per headquarters): `headquarters_id`, `name`, `start_time`, `end_time`
 - **Class CRUD** (per classroom + instructor + schedule): `classroom_id`, `instructor_id`, `schedule_id`, `name`, `start_date`, `quota`
 - **ClassInscription** (many-to-many Class ↔ Student): `class_id`, `student_id`, `inscription_date`, `graduation_date`, `role` (leader/follower)
@@ -98,35 +94,35 @@ Academy → HQ → Classroom → Class → Inscription ← Student
 ## 📡 Current API Endpoints
 
 ### Auth
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register academy |
-| POST | `/api/auth/login` | Get tokens |
-| POST | `/api/auth/refresh` | Refresh access token |
-| POST | `/api/auth/logout` | Revoke refresh token (204) |
+| Method | Endpoint             | Description                |
+| ------ | -------------------- | -------------------------- |
+| POST   | `/api/auth/register` | Register academy           |
+| POST   | `/api/auth/login`    | Get tokens                 |
+| POST   | `/api/auth/refresh`  | Refresh access token       |
+| POST   | `/api/auth/logout`   | Revoke refresh token (204) |
 
 ### Headquarters (scoped by academy)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/headquarters` | List (paginated) |
-| POST | `/api/headquarters` | Create |
-| GET | `/api/headquarters/{id}` | Get by ID |
-| PUT | `/api/headquarters/{id}` | Update |
-| DELETE | `/api/headquarters/{id}` | Delete |
+| Method | Endpoint                 | Description      |
+| ------ | ------------------------ | ---------------- |
+| GET    | `/api/headquarters`      | List (paginated) |
+| POST   | `/api/headquarters`      | Create           |
+| GET    | `/api/headquarters/{id}` | Get by ID        |
+| PUT    | `/api/headquarters/{id}` | Update           |
+| DELETE | `/api/headquarters/{id}` | Delete           |
 
 ### Classrooms (scoped by academy)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/classrooms` | List (paginated) |
-| POST | `/api/classrooms` | Create |
-| GET | `/api/classrooms/{id}` | Get by ID |
-| PUT | `/api/classrooms/{id}` | Update |
-| DELETE | `/api/classrooms/{id}` | Delete |
+| Method | Endpoint               | Description      |
+| ------ | ---------------------- | ---------------- |
+| GET    | `/api/classrooms`      | List (paginated) |
+| POST   | `/api/classrooms`      | Create           |
+| GET    | `/api/classrooms/{id}` | Get by ID        |
+| PUT    | `/api/classrooms/{id}` | Update           |
+| DELETE | `/api/classrooms/{id}` | Delete           |
 
 ### Health
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | `{status, database}` |
+| Method | Endpoint  | Description          |
+| ------ | --------- | -------------------- |
+| GET    | `/health` | `{status, database}` |
 
 ---
 
