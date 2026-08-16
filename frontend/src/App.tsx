@@ -1,15 +1,20 @@
+import { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { Login } from "./features/auth/Login";
-import { Register } from "./features/auth/Register";
+import { DashboardLayout } from "./components/layout/DashboardLayout";
+import { Sidebar } from "./components/layout/Sidebar";
+import { Topbar } from "./components/layout/Topbar";
+import { LoginPage, RegisterPage } from "./features/auth";
+import { DashboardPage } from "./features/dashboard";
 
-function ProtectedPage() {
+function DashboardWrapper() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Welcome to Academy CRM</h2>
-      <p className="text-gray-600">You are logged in. This is a protected page.</p>
-    </div>
+    <DashboardLayout
+      sidebar={<Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />}
+      topbar={<Topbar onMenuClick={() => setSidebarOpen(true)} />}
+    />
   );
 }
 
@@ -17,18 +22,19 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route
           element={
             <ProtectedRoute>
-              <Layout />
+              <DashboardWrapper />
             </ProtectedRoute>
           }
         >
-          <Route path="/protected" element={<ProtectedPage />} />
+          <Route path="/protected" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<LoginPage />} />
       </Routes>
     </BrowserRouter>
   );
